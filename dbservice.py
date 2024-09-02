@@ -75,3 +75,12 @@ def check_email_pass(email,password):
     curr.execute(query,(email,password))
     data=curr.fetchall()
     return data
+
+
+
+# update products 
+def update_product(values,id):
+    query = "update products set name = %s,buying_price = %s,selling_price= %s,stock_quantity=%s where email=%s"
+    curr.execute(query,(values,id,))
+    conn.commit
+    

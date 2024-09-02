@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash,session
-from dbservice import get_data, insert_products, insert_sales, s_product, product_profit, register_user, check_email, check_email_pass
+from dbservice import get_data, insert_products, insert_sales, s_product, product_profit, register_user, check_email, update_product,conn,curr
 from flask_bcrypt import Bcrypt
 from functools import wraps
+
 # create Flask instance
 # configure your application
 # define routes
@@ -64,6 +65,32 @@ def add_products():
 # get => fetch
 # put=>update
 # delete=>
+
+# edit product
+@app.route('/edit_product',methods=['POST','GET'])
+def edit_prod():
+    if "email" not in session:
+        return redirect(url_for('login'))
+    if request.method=="POST":
+        pid = request.form['product_id']
+        pname = request.form['product_name']
+        bprice = request.form['buying_price']
+        sprice = request.form['selling_price']
+        squantity = request.form['stock_quantity']
+        # update
+        query = '''UPDATE products
+           SET name = %s,
+               buying_price = %s,
+               selling_price = %s,
+               stock_quantity = %s
+           WHERE id = %s'''
+        # Assuming you are using a cursor from a database connection
+        curr.execute(query, (pname, bprice, sprice, squantity, pid))
+        # commit the changes
+        conn.commit
+        return redirect(url_for('products'))
+    return render_template('edit_product.html')
+
 
 
 @app.route("/sales")
@@ -158,8 +185,6 @@ def login():
             else:
                 flash("password is incorrect")
     return render_template('login.html')
-
-
 
 
 
